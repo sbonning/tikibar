@@ -9,9 +9,25 @@ def welcome ():
 	print ("\n\n\n\nA bartender with one eye greets you with a smile.  Or a grimace.  It's hard to tell.\n")
 	print ("	-Welcome to Sam's Tiki Bar!")
 
+def customer (customers):
+	"""Asks for the customer name, and if they are a repeat customer will give them the same drink as before"""
+	name = input("	-And what's your name, friend?")
+	try:
+		customers[name]
+		if customers[name][1] == 'water':
+			print ("Bartender scowls and pours you a water")
+		else:
+			print ("	-Oh {0}, I know you like a {3}, in a {1}, with {2}. Let me mix it up for you.".format(name, customers[name][0],customers[name][1],customers[name][2]))
+		## Is there a better way to call a list in a dictionary entry other than x[y][z]?  This is not attractive
+		new_customer = False
+	except:
+		print ("	-Oh, a newbie.  We'll fix something special up for you!")
+		new_customer = True
+	return name, new_customer
+	# I'm only doing a tuple here because I can't work out how to change the value of new_customer otherwise
 
 def glass_pref():
-	"""I welcome the customer and choose a glass for the drink"""
+	"""Choose a glass for the drink"""
 	glassware = {'1': "cute animal mug", '2': "culturally appropriate mug"}
 	print ("	-First choose your glassware.  We pride ourselves on our original Tiki mugs!")
 	print ("	-What are you thinking: Novelty animal, or one of our cultural options?\n")
@@ -50,6 +66,7 @@ def drink_pref():
 					drink[flav] = False
 				else:
 					print ("Sorry to ask again, but I got a bit confused.  Simple 'Yes' or 'No' will do.")
+					## I would prefer for this line not to repeat - any suggestions
 					repeat = True
 		except:
 			print ("Sorry to ask again, but I got a bit confused.  Simple 'Yes' or 'No' will do.")
@@ -59,7 +76,7 @@ def drink_pref():
 	return drink
 
 
-def drink_mix (drink = {'strong':1, 'salty':1, 'bitter':1, 'fruity': 0}):
+def drink_mix (drink):
 	"""I mix up a random drink based on what the customer likes"""
 	your_drink = []
 	import random
@@ -77,6 +94,7 @@ def drink_mix (drink = {'strong':1, 'salty':1, 'bitter':1, 'fruity': 0}):
 			continue
 	if your_drink == []:
 		print ("Well, it seems that you did something to offend the bartender, because he gave you a water.")
+		ing_string = "water"
 	else:
 		ing_string = ""
 		if len(your_drink) == 1:
@@ -85,12 +103,35 @@ def drink_mix (drink = {'strong':1, 'salty':1, 'bitter':1, 'fruity': 0}):
 			for a in your_drink[0:len(your_drink)-1]:
 				ing_string = ing_string+a+", "
 			ing_string = ing_string+"and "+ your_drink[len(your_drink)-1]+"."
-		return ing_string
+	return ing_string
 
-def deliver_drink(ing_string, glass, another):
-	print ("	-Here you go.  I've mixed up a special one for you!")
-	print ("	-In your {0}, highlights of {1}".format(glass,ing_string))
-	print ("	-Enjoy! Let me know if you'd like another.")
+def deliver_drink(ing_string, glass, name, customers):
+	"""Creates the drink for the new customer"""
+	import random
+	drink_name_set = {
+	"first": ["Thirsty","Dancing","Cool","Flirty"],
+	"second": ["Pelican", "Barbarian", "Hawaiian Girl", "Mule"]
+	}
+	drink_name = random.choice(drink_name_set["first"]) + " " + random.choice(drink_name_set["second"])
+	if ing_string == "water":
+		customers[name] = [glass, ing_string, drink_name]
+		return customers
+	else:
+		print ("	-Here you go, {}.  I've mixed up a special one for you!".format(name))
+		print ("	-In your {0}, highlights of {1}.  It's called {2}.".format(glass,ing_string, drink_name))
+		customers[name] = [glass, ing_string, drink_name]
+		print ("	-Enjoy! Let me know if you'd like another.\n")
+		# new_customer = False
+		# I tried to change new_customer to false here but it's not working.. so I had to to it in the drink_program function
+		return customers
+
+
+## I had to split out the "deliver_drink" from the "another_drink" function because I couldn't work out how to return multiple variables
+## from deliver_drink and I had to save the updated customers dictionary so I couldn't update the another value for the variable 
+## I think I have to return the updated value of another as a global variable to ensure that it updates in drink_program function?
+
+def another_drink(another):
+	"""Checks if you want another drink when you are done, new or existing customer"""
 	another = input("Done already? Say yes if you'd like another.")
 	if another.upper() == "YES":
 		another = True
@@ -99,19 +140,32 @@ def deliver_drink(ing_string, glass, another):
 	return another
 
 
-
-
 def drink_program ():
 	"""Ties the entire program together"""
-	welcome()
+	customers = {}
 	another = True
+	new_customer = True
 	
+	welcome()
 	while another == True:
-		glass = glass_pref()
-		drink = drink_pref()
-		ing_string = drink_mix(drink)
-		another = deliver_drink(ing_string,glass,another)
-		## can we please talk about local v global variables here?  I'm not sure if I've done something sticky with another
+		name_new = customer(customers)
+		name = name_new [0]
+		if name_new[1] == False:
+			new_customer = False
+		else:
+			new_customer = True
+		## This seems also like not best practice - i'm parsing the tuple here because I couldn't work out how to set new_customer within the function
+
+		while new_customer == True:
+			glass = glass_pref()
+			drink = drink_pref()
+			ing_string = drink_mix(drink)
+			customers = deliver_drink(ing_string, glass, name, customers)
+			new_customer = False
+		
+		another = another_drink(another)
+			## can we please talk about local v global variables here?  I'm not sure if I've done something strange with variable "another"
+			## also i'm pretty sure I shouldn't be doing x = something(x), seems bad
 	print("    -Thanks for drinking with us!")
 
 if __name__ == "__main__":
