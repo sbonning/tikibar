@@ -104,6 +104,8 @@ def drink_mix (drink):
 				ing_string = ing_string+a+", "
 			ing_string = ing_string+"and "+ your_drink[len(your_drink)-1]+"."
 	return ing_string
+	## if i'd thought about the last problem with decreasing stock at the start, I wouldn't have created a string for the ing_string variable
+	## but since I did I decided it was too much work to reverse it and do the stocktake
 
 def deliver_drink(ing_string, glass, name, customers):
 	"""Creates the drink for the new customer"""
