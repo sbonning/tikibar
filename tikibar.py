@@ -3,6 +3,9 @@
 ##Description of functionality:
 ## - the Bartender will ask a series of questions about your tastes (mug and drink)
 ## - the Bartender will mix you up a delicious beverage/s until you are done!
+import random
+## always import at the start 
+
 
 def welcome ():
 	"""Welcome the customer to the bar"""
@@ -78,8 +81,8 @@ def drink_pref():
 
 def drink_mix (drink):
 	"""I mix up a random drink based on what the customer likes"""
-	your_drink = []
 	import random
+	your_drink = []
 	ingredients = {
     "strong": ["glug of rum", "slug of whisky", "splash of gin"],
     "salty": ["olive on a stick", "salt-dusted rim", "rasher of bacon"],
@@ -87,6 +90,7 @@ def drink_mix (drink):
     "fruity": ["slice of orange", "dash of cassis", "cherry on top"],
 	}
 	for d in drink.keys():
+		## can also just say for d in drink: - because will automatically be in key
 		new_ing = random.choice(ingredients[d])
 		if drink[d] == 1:
 			your_drink.append(new_ing)
@@ -140,6 +144,7 @@ def another_drink(another):
 	else:
 		another = False
 	return another
+	## return input == "Yes" (could be less lines of code)
 
 
 def drink_program ():
